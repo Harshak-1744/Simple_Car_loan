@@ -1,55 +1,73 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 public class Simple_Car_Loan {
-    public static double calculateCarLoanEMI(double principal, double interestRate, int loanTerm) {
-        double r = interestRate / 12 / 100;  // Convert annual interest rate to monthly rate
-        int n = loanTerm * 12;  // Convert loan term from years to months
 
-        double emi = (principal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-        return emi;
+    private static Scanner sc = new Scanner(System.in);
+
+    private static double getInputDouble(String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                return sc.nextDouble();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                sc.nextLine();
+            }
+        }
     }
 
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter your age:");
-        int age = sc.nextInt();
-        if (age >= 21 && age <= 60) {
-            System.out.println("Enter your income:");
-            int income = sc.nextInt();
-            if (income >= 25000) {
-                System.out.println("Enter your credit score:");
-                int creditScore = sc.nextInt();
-                if (creditScore >= 700) {
-                    System.out.println("You are eligible for a loan.");
-                } else {
-                    System.out.println("You are not eligible for a loan.");
-                }
-            } else {
-                System.out.println("You are not eligible for a loan.");
+    private static int getInputInt(String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                return sc.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter an integer.");
+                sc.nextLine();
             }
-        } else {
-            System.out.println("You are not eligible for a loan.");
         }
+    }
 
-        System.out.println("EMI Calculator.....");
+    private static boolean checkEligibility() {
+        System.out.println("\n--- Checking Loan Eligibility ---");
 
-        System.out.println("Enter Amount: ");
-        double principal = sc.nextDouble();
-        System.out.println("Enter interest rate: ");
-        double interestRate = sc.nextDouble();
-        System.out.println("Enter number of years: ");
-        int loanTerm = sc.nextInt();
+        int age = getInputInt("Enter your age: ");
+        int income = getInputInt("Enter your income: ");
+        int creditScore = getInputInt("Enter your credit score: ");
+
+        return age >= 21 && age <= 60 && income >= 25000 && creditScore >= 700;
+    }
+
+    private static void calculateAndDisplayEMI() {
+        System.out.println("\n--- EMI Calculator ---");
+
+        double principal = getInputDouble("Enter Amount: ");
+        double interestRate = getInputDouble("Enter interest rate (in percentage): ");
+        int loanTerm = getInputInt("Enter number of years: ");
 
         double emi = calculateCarLoanEMI(principal, interestRate, loanTerm);
         double roundedEMI = Math.round(emi * 100) / 100.0;
 
-        NumberFormat formatter = new DecimalFormat("#,##0.00");
-        String formattedEMI = formatter.format(roundedEMI);
+        System.out.println("Your monthly EMI: " + new DecimalFormat("#,##0.00").format(roundedEMI));
+    }
 
-        System.out.println("EMI: " + formattedEMI);
+    private static double calculateCarLoanEMI(double principal, double interestRate, int loanTerm) {
+        double r = interestRate / 12 / 100;
+        int n = loanTerm * 12;
+        return (principal * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    }
 
+    public static void main(String[] args) {
+        if (checkEligibility()) {
+            System.out.println("Congratulations! You are eligible for a loan.");
+            calculateAndDisplayEMI();
+        } else {
+            System.out.println("Sorry, you are not eligible for a loan.");
+        }
+        
+        System.out.println("Thank you for using Car Loan Assistant. Goodbye!");
         sc.close();
     }
 }
